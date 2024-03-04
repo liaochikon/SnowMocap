@@ -1,4 +1,4 @@
-<br />
+![image](https://github.com/liaochikon/SnowMocap/assets/38479698/ba24d8b1-0177-4545-9a2e-6b7d2554f558)<br />
 <div align="center">
   <h1 align="center">SnowMocap</h1>
   <h2 align="center">This project is still work in progress!!!</h2>
@@ -8,6 +8,8 @@
   </p>
 </div>
 <img src="image/mocap_demo_gif.gif">
+
+Video demo: https://youtu.be/W_3FVEXP7Nk
 
 ## About This Project
 
@@ -29,6 +31,42 @@ The camera I'm using are 4 ASUS webcams(ASUS webcam c3)
 https://www.asus.com/tw/accessories/streaming-kits/all-series/asus-webcam-c3/
 
 <img src="https://dlcdnwebimgs.asus.com/gain/397bff36-2a38-4408-a7a1-922a6520f39d/w692" height=400>
+
+Then I designed a 2DOF webcam mount to fix the webcam on th ceiling.
+
+By doing so, I can get the widest view of the room.
+
+Camera mount CAD:
+
+<img src="image/camera_holder.png" height=400>
+
+3D printed camera mount + webcam:
+
+<img src="image/camera_holder_3dprinted.png" height=400>
+
+Camera array:
+
+<img src="image/camera_setup.png" height=400>
+
+Because the webcam's USB2.0 cable is not long enough to connect all 4 cameras to my computer.
+
+I decided to use second computer as a recorder and transmit video stream via LAN(Socket UDP)
+
+So the network structure look like this:
+
+recorder computer: lan_streamer.py   ==frame data==>   main computer: snowmocap_live.py
+
+## Camera Calibration
+### Intrinsic Matrix
+
+Simple use checkerboard calibrate to get the intrinsic matrix K
+
+<img src="https://docs.opencv.org/4.x/calib_pattern.jpg" height=300>
+
+
+
+https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+
 
 ## Algorithm
 The tracking method I choose is HRNet keypoint detection.
