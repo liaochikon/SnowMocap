@@ -12,6 +12,7 @@
 Video demo: https://youtu.be/W_3FVEXP7Nk
 
 ## About This Project
+### Introduction
 
 (Sorry for the bad english, it's not my first language. (´c_`) )
 
@@ -28,6 +29,36 @@ Because the animation is already in the animation timeline of Blender, so it can
 At the current state, the result animation is still pretty janky and jittery, I'm planning to slowly fix these problems, and make this repo a more user friendly Blender plugin. 
 
 So please stay tuned!!!
+
+### Algorithm
+The tracking method I choose is HRNet keypoint detection.
+
+<img src="https://github.com/HRNet/HRNet-Human-Pose-Estimation/raw/master/figures/hrnet.png" height=250>
+
+Because of its high resolution and multi-sacle feature extraction makes it very suitable for the project.
+
+HRNet outputs the most satisfying keypoint detection result in my opinion.
+
+I'm using simple-HRNet in this project, this is a amazing realization of the original paper
+
+https://github.com/stefanopini/simple-HRNet
+
+And here's the official pytorch implementation of HRNet
+
+https://github.com/leoxiaobin/deep-high-resolution-net.pytorch
+
+https://arxiv.org/abs/1902.09212
+
+<img src="image/single_person_cam.gif" height=300>
+
+After we get 2D keypoint for every camera, using pinhale camera model and some optimization method we can get 3D points for each joint.
+
+<img src="image/pin_hole.png">
+<img src="image/triangulation.png" height=200>
+
+Then we'll use Socket UDP to transmit the 3D joints to Blender, and insert every keyframe of the mocap data.
+
+In the end, we can get 3D markerless mocap animation right out of the box.
 
 ## Setup
 The camera I'm using are 4 ASUS webcams(ASUS webcam c3)
@@ -58,11 +89,15 @@ I decided to use another computer as a recorder and transmit video stream via LA
 
 So the network structure look like this:
 
-recorder computer: lan_streamer.py   ==frame data==>   main computer: snowmocap_live.py
+recorder computer(lan_streamer.py)   ==frame data==>   main computer
 
 ## Installation
 ### Install Dependency
-First, install all dependency.
+First, make sure your python version is 3.8 
+```sh
+python 3.8
+```
+Install all dependency.
 
 ```sh
 pip install -r requirements.txt
@@ -73,17 +108,6 @@ Install simple-HRNet in the root folder.
 https://github.com/stefanopini/simple-HRNet
 
 Then, rename "simple-HRNet" folder to "HRNet".
-
-### Download Synchronized Test Videos
-Create a folder named "video" in root folder
-
-```sh
-mkdir video
-```
-
-Download all videos to the video folder
-
-https://drive.google.com/drive/folders/1frEk-DhsxYdoJUIkspit7tTDXSINwjo5?usp=sharing
 
 ### Install Blender
 
@@ -108,9 +132,9 @@ I wrote a GUI (PyQT5) to calibrate lan cameras (Cal_GUI.py), but it's a bit of a
 
 So I'll probably write a more versatile camera calibrate tool in the future.
 
-### extrinsic Matrix
+### extrinsic matrix
 
-<img src="image/Rt.png">
+<img src="image/R_t.png">
 
 Once we get the intrinsic matrix we can start to find the extrinsic Matrix Rt.
 
@@ -124,20 +148,35 @@ python bundle_adjustment.py
 
 <img src="image/bundle_adjustment.png">
 
+The extrinsic matrix will be more and more accurate as the algorithm iterate.
 
+## Demo
+### Download Synchronized Test Videos
+Create a folder named "video" in root folder
 
-## Algorithm
-The tracking method I choose is HRNet keypoint detection.
+```sh
+mkdir video
+```
 
-<img src="image/single_person_cam.gif" height=300>
-<img src="https://github.com/HRNet/HRNet-Human-Pose-Estimation/raw/master/figures/hrnet.png" height=250>
+Download all videos to the video folder
 
-Because of its high resolution and multi-sacle feature extraction makes it very suitable for the project.
+https://drive.google.com/drive/folders/1frEk-DhsxYdoJUIkspit7tTDXSINwjo5?usp=sharing
 
-HRNet outputs the most satisfying keypoint detection result in my opinion.
+### Pre-Recorded Video Mocap
+Run snowmocap_prerecord_demo.py
+```sh
+python snowmocap_prerecord_demo.py
+```
 
+### Pre-Recorded Video Mocap With Blender Animation
+Open up the empty_animation.blend file locate in blend folder
 
+Go to the script tab and press the run button to start the script.
 
+<img src="image/blender.png">
 
+Run snowmocap_prerecord.py
 
-
+```sh
+python snowmocap_prerecord.py
+```
