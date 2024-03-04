@@ -1,4 +1,4 @@
-![image](https://github.com/liaochikon/SnowMocap/assets/38479698/ba24d8b1-0177-4545-9a2e-6b7d2554f558)<br />
+<br />
 <div align="center">
   <h1 align="center">SnowMocap</h1>
   <h2 align="center">This project is still work in progress!!!</h2>
@@ -25,7 +25,11 @@ Finally, use the IK function within blender and the predefined rig the produce h
 
 Because the animation is already in the animation timeline of Blender, so it can be exported or modified easily.
 
-## My Setup
+At the current state, the result animation is still pretty janky and jittery, I'm planning to slowly fix these problems, and make this repo a more user friendly Blender plugin. 
+
+So please stay tuned!!!
+
+## Setup
 The camera I'm using are 4 ASUS webcams(ASUS webcam c3)
 
 https://www.asus.com/tw/accessories/streaming-kits/all-series/asus-webcam-c3/
@@ -50,22 +54,76 @@ Camera array:
 
 Because the webcam's USB2.0 cable is not long enough to connect all 4 cameras to my computer.
 
-I decided to use second computer as a recorder and transmit video stream via LAN(Socket UDP)
+I decided to use another computer as a recorder and transmit video stream via LAN(Socket UDP)
 
 So the network structure look like this:
 
 recorder computer: lan_streamer.py   ==frame data==>   main computer: snowmocap_live.py
 
+## Installation
+### Install Dependency
+First, install all dependency.
+
+```sh
+pip install -r requirements.txt
+```
+### Install Simple-HRNet
+Install simple-HRNet in the root folder.
+
+https://github.com/stefanopini/simple-HRNet
+
+Then, rename "simple-HRNet" folder to "HRNet".
+
+### Download Synchronized Test Videos
+Create a folder named "video" in root folder
+
+```sh
+mkdir video
+```
+
+Download all videos to the video folder
+
+https://drive.google.com/drive/folders/1frEk-DhsxYdoJUIkspit7tTDXSINwjo5?usp=sharing
+
+### Install Blender
+
+https://www.blender.org/
+
+Done!
+
 ## Camera Calibration
 ### Intrinsic Matrix
 
-Simple use checkerboard calibrate to get the intrinsic matrix K
+<img src="image/k.png">
+
+Simple use checkerboard calibrate to get the intrinsic matrix K.
+
+https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
 
 <img src="https://docs.opencv.org/4.x/calib_pattern.jpg" height=300>
 
 
 
-https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+I wrote a GUI (PyQT5) to calibrate lan cameras (Cal_GUI.py), but it's a bit of a hassle to use, because you can only use it on lan cameras.
+
+So I'll probably write a more versatile camera calibrate tool in the future.
+
+### extrinsic Matrix
+
+<img src="image/Rt.png">
+
+Once we get the intrinsic matrix we can start to find the extrinsic Matrix Rt.
+
+Since we already have intrinsic matrix, we can use human keypoint detection and bundle adjustment algorithm to get all webcam's position and rotation.
+
+Simply run bundle_adjustment.py and it will automatically output each webcam's position and rotation.
+
+```sh
+python bundle_adjustment.py
+```
+
+<img src="image/bundle_adjustment.png">
+
 
 
 ## Algorithm
