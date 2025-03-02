@@ -1,0 +1,6 @@
+{
+    "blender_result_list_path" : "../mocap_data_output/blender_mocap_data.json",
+    "blender_armature_index_path" : "../configs/blender_armature_profile.json",
+    "start_frame" : 20,
+    "frame_gap" : 2
+}
