@@ -60,8 +60,6 @@ If you are using tripods, you can use duct tape to stick USB cables on the groun
 
 https://www.anaconda.com/download/
 
-
-
 You can still use local python to install the dependency and run this project, but it'll be a pain in the ass if you were trying to reinstall some packages.
 
 Once miniconda is installed, open **Anaconda Prompt** and type:
@@ -146,11 +144,26 @@ pip install -r requirements.txt
 
 **SOFTWARE SETUP DONE!**
 
-### 3. Calibration
+### 3. Demo
+[Videos](https://drive.google.com/drive/folders/1tiRy1VV34z3RA42Lt3HkuZKdGh1zT4BU?usp=drive_link)
 
-### 4. Motion Capture
+```
+python main.py configs\snowmocap_default_config.json
+```
 
-### 5. Blender Animation
+
+
+### 4. Calibration
+
+
+
+### 5. Motion Capture Workflow
+
+
+
+### 6. Blender Animation
+
+
 
 ## Modification
 
