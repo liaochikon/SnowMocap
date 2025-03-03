@@ -1,182 +1,75 @@
-<br />
-<div align="center">
-  <h1 align="center">SnowMocap</h1>
-  <h2 align="center">This project is still work in progress!!!</h2>
-  <p align="center">
-    A free Blender 3D multi-camera mocap solution.
-    <br />
-  </p>
-</div>
-<img src="image/mocap_demo_gif.gif">
+# SnowMocap - A free Blender mocap solution integrated with camera array 
 
-Video demo: https://youtu.be/W_3FVEXP7Nk
+[繁體中文文檔](docs/ch.md)
 
-## About This Project
-### Introduction
+## Introduction
 
-(Sorry for the bad english, it's not my first language. (´c_`) )
+I'm building a simple but reliable 3D mocap solution for Blender.
 
-I'm tring to build a simple but reliable 3D mocap solution for blender.
+The goal of this project is to make the mocap setup as cheap as possible, so no expensive mocap ir cameras or specialized tracking suit, but also capable enough to use in all sorts of project(game asset, 3D animation, etc...)
 
-The goal of this project is to make the mocap setup as cheap as possible, so no expensive mocap ir cameras and no tracking suit, but also capable enough to use in all sorts of project(game asset, 3D animation, etc...)
+4 RGB wedcams + human keypoint detection were used to accomplish the 2D human feature extraction and multi-camera triangulation, and we can get the precise 3D Human keypoints.
 
-I'll be using RGB wedcams + human keypoint detection to accomplish the 2D human feature extraction and multi-camera triangulation to get precise 3D keypoint result.
+Finally, use the predefined armature in Blender to translate the keypoint data and produce continuous 3D human skeletal animation.
 
-Finally, use the IK function within blender and the predefined rig the produce human skeleton animation.
+## Get started
 
-Because the animation is already in the animation timeline of Blender, so it can be exported or modified easily.
+### Hardware
+ - 4 webcams
+ - 4 camera mounts (tripod)
+ - 4 10m(or longer) USB signal booster cable
+ - A computer with Nvidia GPU
 
-At the current state, the result animation is still pretty janky and jittery, I'm planning to slowly fix these problems, and make this repo a more user friendly Blender plugin. 
+### 1. Hardware Setup
+**1. Room setup**
 
-So please stay tuned!!!
+First, you need a space big enough for motion capturing.The room I used for this project is around 10m x 10m wide and 3m tall.
 
-### Algorithm
-The tracking method I choose is HRNet keypoint detection.
+img_room
 
-<img src="https://github.com/HRNet/HRNet-Human-Pose-Estimation/raw/master/figures/hrnet.png" height=250>
+**2. Camera array setup**
+ 
+ Install all 4 webcams at 4 corners using camera mounts or tripods
 
-Because of its high resolution and multi-sacle feature extraction makes it very suitable for the project.
+img_camera_mount
+img_camera_room_setup
 
-HRNet outputs the most satisfying keypoint detection result in my opinion.
+**3. USB cable setup**
 
-I'm using simple-HRNet in this project, this is a amazing realization of the original paper
+Use the USB signal booster cable to connect the webcams and your computer
 
-https://github.com/stefanopini/simple-HRNet
+### 2. Software Setup
+**1. Install miniconda**
 
-And here's the official pytorch implementation of HRNet
+https://www.anaconda.com/download/
 
-https://github.com/leoxiaobin/deep-high-resolution-net.pytorch
+**Virtual environment is recommended.**
 
-https://arxiv.org/abs/1902.09212
+You can still use local python to install the dependency and run this project, but it'll be a pain in the ass if you were trying to reinstall some packages.
 
-<img src="image/single_person_cam.gif" height=300>
+**2. Install rtmlib**
 
-After we get 2D keypoint for every camera, using pinhale camera model and some optimization method we can get 3D points for each joint.
+https://github.com/Tau-J/rtmlib
 
-<img src="image/pin_hole.png">
-<img src="image/triangulation.png" height=200>
+rtmlib's installation might need a little work around to get it working correctly.
 
-Then we'll use Socket UDP to transmit the 3D joints to Blender, and insert every keyframe of the mocap data.
+I have test the project on two PCs, one with RTX4060 and other with RTX3060.
 
-In the end, we can get 3D markerless mocap animation right out of the box.
+It turns out that **the onnxruntime/onnxruntime-gpu and cuda/cudnn version will be different for different GPUs.**
 
-## Setup
-The camera I'm using are 4 ASUS webcams(ASUS webcam c3)
+table_onnxruntime/onnxruntime-gpu_version
+table_cuda/cudnn_version
 
-https://www.asus.com/tw/accessories/streaming-kits/all-series/asus-webcam-c3/
+**3. Install SnowMocap**
 
-<img src="https://dlcdnwebimgs.asus.com/gain/397bff36-2a38-4408-a7a1-922a6520f39d/w692" height=400>
 
-Then I designed a 2DOF webcam mount to fix the webcam on th ceiling.
 
-By doing so, I can get the widest view of the room.
+### 3. Calibration
 
-Camera mount CAD:
+### 4. Motion Capture
 
-<img src="image/camera_holder.png" height=400>
+### 5. Blender Animation
 
-3D printed camera mount + webcam:
+## Modification
 
-<img src="image/camera_holder_3dprinted.png" height=400>
-
-Camera array:
-
-<img src="image/camera_setup.png" height=400>
-
-Because the webcam's USB2.0 cable is not long enough to connect all 4 cameras to my computer.
-
-I decided to use another computer as a recorder and transmit video stream via LAN(Socket UDP)
-
-So the network structure look like this:
-
-recorder computer(lan_streamer.py)   ==frame data==>   main computer
-
-## Installation
-### Install Dependency
-First, make sure your python version is 3.8 
-```sh
-python 3.8
-```
-Install all dependency.
-
-```sh
-pip install -r requirements.txt
-```
-### Install Simple-HRNet
-Install simple-HRNet in the root folder.
-
-https://github.com/stefanopini/simple-HRNet
-
-Then, rename "simple-HRNet" folder to "HRNet".
-
-### Install Blender
-
-https://www.blender.org/
-
-Done!
-
-## Camera Calibration
-### Intrinsic Matrix
-
-<img src="image/k.png">
-
-Simple use checkerboard calibrate to get the intrinsic matrix K.
-
-https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
-
-<img src="https://docs.opencv.org/4.x/calib_pattern.jpg" height=300>
-
-
-
-I wrote a GUI (PyQT5) to calibrate lan cameras (Cal_GUI.py), but it's a bit of a hassle to use, because you can only use it on lan cameras.
-
-So I'll probably write a more versatile camera calibrate tool in the future.
-
-### extrinsic matrix
-
-<img src="image/R_t.png">
-
-Once we get the intrinsic matrix we can start to find the extrinsic Matrix Rt.
-
-Since we already have intrinsic matrix, we can use human keypoint detection and bundle adjustment algorithm to get all webcam's position and rotation.
-
-Simply run bundle_adjustment.py and it will automatically output each webcam's position and rotation.
-
-```sh
-python bundle_adjustment.py
-```
-
-<img src="image/bundle_adjustment.png">
-
-The extrinsic matrix will be more and more accurate as the algorithm iterate.
-
-## Demo
-### Download Synchronized Test Videos
-Create a folder named "video" in root folder
-
-```sh
-mkdir video
-```
-
-Download all videos to the video folder
-
-https://drive.google.com/drive/folders/1frEk-DhsxYdoJUIkspit7tTDXSINwjo5?usp=sharing
-
-### Pre-Recorded Video Mocap
-Run snowmocap_prerecord_demo.py
-```sh
-python snowmocap_prerecord_demo.py
-```
-
-### Pre-Recorded Video Mocap With Blender Animation
-Open up the empty_animation.blend file locate in blend folder
-
-Go to the script tab and press the run button to start the script.
-
-<img src="image/blender.png">
-
-Run snowmocap_prerecord.py
-
-```sh
-python snowmocap_prerecord.py
-```
+## Contact
