@@ -114,6 +114,7 @@ cuda                  12.8.0
 cudnn                 9.1.1.17
 onnxruntime           1.16.0
 onnxruntime-gpu       1.19.0
+
 #PC with RTX4060
 cuda                  12.6.3
 cudnn                 9.1.1.17
