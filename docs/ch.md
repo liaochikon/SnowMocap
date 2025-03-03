@@ -1,3 +1,8 @@
+---
+title: ABOUT PAGE
+layout: template
+filename: ch.md
+--- 
 <br />
 <div align="center">
   <h1 align="center">SnowMocap</h1>
