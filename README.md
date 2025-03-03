@@ -6,6 +6,8 @@
 
 I'm building a simple but reliable 3D mocap solution for Blender.
 
+<img src="image/intro.gif">
+
 The goal of this project is to make the mocap setup as cheap as possible, so no expensive mocap ir cameras or specialized tracking suit, but also capable enough to use in all sorts of project(game asset, 3D animation, etc...)
 
 4 RGB wedcams + human keypoint detection were used to accomplish the 2D human feature extraction and multi-camera triangulation, and we can get the precise 3D Human keypoints.
