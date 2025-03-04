@@ -142,29 +142,136 @@ cd SnowMocap
 pip install -r requirements.txt
 ```
 
+**5. Install Blender**
+
+https://www.blender.org/download/
+
 **SOFTWARE SETUP DONE!**
 
-### 3. Demo
-[Videos](https://drive.google.com/drive/folders/1tiRy1VV34z3RA42Lt3HkuZKdGh1zT4BU?usp=drive_link)
+### 3. Pre-Recorded Demo
+
+The folder named **videos** in the root directory is where you'll put your videos for motion capturing.
+
+So the directory will looks like :
+
+```
+${SnowMocap}
+├── blender
+├── configs
+├── docs
+├── image
+├── mocap_data_output
+├── snowvision
+├── videos
+    ├── video0.avi
+    ├── video1.avi
+    ├── video2.avi
+    ├── video3.avi
+...
+```
+
+Download the videos I recorded and put them in the **videos** folder.
+
+Videos : 
+[( Google Drive )](https://drive.google.com/drive/folders/1tiRy1VV34z3RA42Lt3HkuZKdGh1zT4BU?usp=drive_link)
+
+Simply run :
 
 ```
 python main.py configs\snowmocap_default_config.json
 ```
 
+The **snowmocap_default_config.json** in config folder saves the setting for running SnowMocap.
+
+You can change the parameters in this config file to suit your needs.
+
+``` json
+{
+    "camera_group_info_path" : "configs/camera_group_floor.json", //Camera parameters file path
+    "rtmlib_model_alias" : "Wholebody", //Rtmlib model used for keypoint detection
+    "rtmlib_model_backend" : "onnxruntime", //Rtmlib model's backend framework, it either "onnxruntime" or "openvino"
+    "rtmlib_model_device" : "cuda", //Device that the model runs on, for GPU : "cuda", for CPU : "cpu"
+    "video_names" : ["videos/04212024194216_0.avi",
+                     "videos/04212024194216_1.avi",
+                     "videos/04212024194216_2.avi",
+                     "videos/04212024194216_3.avi"], //Pre-recorded videos for mocaping, it need to have at least 2 videos
+    
+    //2D human keypoints & human triangulation parameters
+    "keypoint_score_threshold" : 3.0,
+    "average_score_threshold" : 0.0,
+    "distance_threshold" : 0.05,
+    "condense_distance_tol" : 10,
+    "condense_person_num_tol" : 0,
+    "condense_score_tol" : 0.0,
+    "center_point_index" : 0,
+    "keypoint_num" : 133,
+    //
+
+    //3D human motion smooth parameters
+    "smooth_f" : 2.5,
+    "smooth_z" : 0.75,
+    "smooth_r" : 0,
+    "smooth_delta_time" : 0.03333333333,
+    //
 
 
-### 4. Calibration
+    "blender_armature_profile_path" : "configs/blender_armature_profile.json", //Blender's armature control bone description file path.
+    "blender_smooth_profile_path" : "configs/blender_smooth_profile.json", //Blender's armature control bone smooth parameters file path.
+    "mocap_data_output_path" : "mocap_data_output/blender_mocap_data.json", //Mocap data's save path, if the file already exists, the file will change it's name to "blender_mocap_data_0.json" or "blender_mocap_data_1.json" etc...
+    "show_video" : true, //Show videos with skeleton visualization
+    "show_plot" : false //Show 3D human pose in matplotlib
+}
+```
 
+Then SnowMocap will start to mocaping pre-recorded videos.
 
+<img src="image\mocaping.png">
+
+After finishing motion capturing, the mocap data will be saved in **mocap_data_output** folder as a json file.
+
+Open **animation_import_scene.blend** in **blender** folder.
+
+Click the **Scripting** tab.
+
+<img src="image\blender1.png">
+
+Click the **Run Script** button, and the mocap data will be transfer to the rig in the Blender scene.
+
+<img src="image\blender2.png">
+
+The mocap data's animation keyframes.
+
+<img src="image\blender3.png">
+
+The Blender's mocap data transfer setting is in **animation_import.json**, which can be found in **blender** folder.
+
+``` json
+{
+    "blender_result_list_path" : "../mocap_data_output/blender_mocap_data.json", //Mocap data path
+    "blender_armature_index_path" : "../configs/blender_armature_profile.json", //Blender's armature control bone description file path.
+    "start_frame" : 20, //The start keyframe in timeline for mocap data transfer
+    "frame_gap" : 2 //The keyframe gap in timeline for mocap data transfer, the animation frame in Blender is 60FPS and the videos are 30FPS, so 60 / 30 = 2
+}
+```
+
+**DEMO DONE!**
+
+### Camera Calibration Tools
+
+Coming soon...
 
 ### 5. Motion Capture Workflow
 
-
+Coming soon...
 
 ### 6. Blender Animation
 
-
+Coming soon...
 
 ## Modification
 
+Coming soon...
+
 ## Contact
+
+Coming soon...
