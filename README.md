@@ -146,11 +146,9 @@ pip install -r requirements.txt
 
 https://www.blender.org/download/
 
-**SOFTWARE SETUP DONE!**
+**6. Create folders**
 
-### 3. Pre-Recorded Demo
-
-The folder named **videos** in the root directory is where you'll put your videos for motion capturing.
+Create two folders named **videos** and **mocap_data_output** in the root directory.
 
 So the directory will looks like :
 
@@ -163,12 +161,12 @@ ${SnowMocap}
 ├── mocap_data_output
 ├── snowvision
 ├── videos
-    ├── video0.avi
-    ├── video1.avi
-    ├── video2.avi
-    ├── video3.avi
 ...
 ```
+
+**SOFTWARE SETUP DONE!**
+
+### 3. Pre-Recorded Demo
 
 Download the videos I recorded and put them in the **videos** folder.
 
