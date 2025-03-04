@@ -254,7 +254,7 @@ The Blender's mocap data transfer setting is in **animation_import.json**, which
 
 **DEMO DONE!**
 
-### Camera Calibration Tools
+### 4. Camera Calibration Tools
 
 Coming soon...
 
