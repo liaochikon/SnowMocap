@@ -54,6 +54,8 @@ USB 線需要具有**訊號增強功能**，否則當 USB 線長度超過 6 公�
 
 **建議使用虛擬環境**
 
+到下面連接安裝 miniconda。
+
 https://www.anaconda.com/download/
 
 其實也可以用本地 Python ，但如果有些 package 出錯要重新安裝就會很麻煩。
