@@ -1,6 +1,6 @@
 # SnowMocap - A free Blender mocap solution integrated with camera array 
 
-[繁體中文文檔](docs/ch.md)
+[繁體中文文檔](README_tc.md)
 
 ## Introduction
 
