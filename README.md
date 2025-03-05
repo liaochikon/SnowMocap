@@ -1,6 +1,6 @@
 # SnowMocap - A free Blender mocap solution integrated with camera array 
 
-[繁體中文文檔](README_tc.md)
+[繁體中文 README](README_tc.md)
 
 ## Introduction
 
@@ -251,6 +251,10 @@ The Blender's mocap data transfer setting is in **animation_import.json**, which
     "frame_gap" : 2 //The keyframe gap in timeline for mocap data transfer, the animation frame in Blender is 60FPS and the videos are 30FPS, so 60 / 30 = 2
 }
 ```
+
+The end result should look the same as the video below :
+
+[Demo result](https://www.youtube.com/watch?v=31JdTrtbHrc)
 
 **DEMO DONE!**
 
