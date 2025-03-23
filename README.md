@@ -9,8 +9,9 @@
 ## ToDo
 
 1. Add camera extrinsic calibration tool
-2. GUI
-3. Tutorial/workflow videos
+2. FPS hand mocap
+3. GUI
+4. Tutorial/workflow videos
 
 ## Introduction
 
