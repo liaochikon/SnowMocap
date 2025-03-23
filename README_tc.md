@@ -262,11 +262,72 @@ Blender 的動作捕捉數據傳輸設定位於 **animation_import.json** 中，
 
 **預錄影像 Demo 結束!**
 
-### 4. 相機陣列校正工具箱
+### 4. 錄影工具
 
-Coming soon...
+單相機錄影工具 :
 
-### 5. 動作捕捉工作流程
+``` 
+python single_camera_recording.py configs\single_camera_recording_config.json
+``` 
+
+主要用來錄製相機內部參數的校正影片，拍攝棋盤格在單相機前的多個姿態。
+
+位於 **configs** 資料夾中的單相機錄影設定檔 :
+
+``` json
+{
+    "cap_id" : 0, //錄製相機 id
+    "resolution" : [1280, 720] //錄製相機解析度
+}
+```
+
+多相機錄影工具 :
+
+``` 
+python multi_camera_recording.py configs\multi_camera_recording_config.json
+``` 
+
+用於錄製動作捕捉與校正相機陣列外部參數。
+
+位於 **configs** 資料夾中的多相機錄影設定檔 :
+
+``` json
+{
+    "cap_ids" : [0, 1, 2, 3], //錄製相機 id
+    "resolutions" : [
+        [1280, 720],
+        [1280, 720],
+        [1280, 720],
+        [1280, 720]] //錄製相機解析度
+}
+```
+
+### 5. 相機校正工具
+
+**內部參數校正**
+
+``` 
+python camera_intrinsic_calibration.py configs\intrinsic_calibration_config.json
+```
+
+位於 **configs** 資料夾中的內部參數校正設定檔 :
+
+``` json
+{
+    "cap_ids" : [0, 1, 2, 3], //錄製相機 id
+    "resolutions" : [
+        [1280, 720],
+        [1280, 720],
+        [1280, 720],
+        [1280, 720]], //錄製相機解析度
+    "video_names" : ["videos/cal_0.avi",
+                     "videos/cal_1.avi",
+                     "videos/cal_2.avi",
+                     "videos/cal_3.avi"], //相機校正影片路徑
+    "camera_group_parameter_names" : "camera_group_intrinsic" //相機校正參數存檔路徑
+}
+```
+**外部參數校正**
 
 Coming soon...
 

@@ -2,6 +2,10 @@
 
 [繁體中文 README](README_tc.md)
 
+## Update
+
+2025/03/23 : Add camera intrinsic calibration tool, single/multi camera recording tool.
+
 ## Introduction
 
 I'm building a simple but reliable 3D mocap solution for Blender.
@@ -258,15 +262,81 @@ The end result should look the same as the video below :
 
 **DEMO DONE!**
 
-### 4. Camera Calibration Tools
+### 4. Camera Recording Tools
+
+For single camera recording :
+
+``` 
+python single_camera_recording.py configs\single_camera_recording_config.json
+``` 
+
+This is mainly for camera intrinsic calibration, for recording checkerboard in different poses.
+
+Single camera recording config in **configs** folder :
+
+``` json
+{
+    "cap_id" : 0, //Recording camera id
+    "resolution" : [1280, 720] //Camera resolution
+}
+```
+
+For multi-camera recording :
+
+``` 
+python multi_camera_recording.py configs\multi_camera_recording_config.json
+``` 
+
+This is for mocap and extrinsic calibration.
+
+Multi-camera recording config in **configs** folder :
+
+``` json
+{
+    "cap_ids" : [0, 1, 2, 3], //Recording camera ids
+    "resolutions" : [
+        [1280, 720],
+        [1280, 720],
+        [1280, 720],
+        [1280, 720]] //Camera resolutions
+}
+```
+
+### 5. Camera Calibration Tools
+
+**Intrinsic Calibration**
+
+``` 
+python camera_intrinsic_calibration.py configs\intrinsic_calibration_config.json
+```
+
+Intrinsic calibration config in **configs** folder :
+
+``` json
+{
+    "cap_ids" : [0, 1, 2, 3], //Recording camera ids
+    "resolutions" : [
+        [1280, 720],
+        [1280, 720],
+        [1280, 720],
+        [1280, 720]], //Camera resolutions
+    "video_names" : ["videos/cal_0.avi",
+                     "videos/cal_1.avi",
+                     "videos/cal_2.avi",
+                     "videos/cal_3.avi"], //Camera calibration video paths
+    "camera_group_parameter_names" : "camera_group_intrinsic" //Output camera parameter json path
+}
+```
+
+**Extrinsic Calibration**
 
 Coming soon...
 
-### 5. Motion Capture Workflow
+### 6. Motion Capture Workflow
 
 Coming soon...
 
-### 6. Blender Animation
+### 7. Blender Animation
 
 Coming soon...
 

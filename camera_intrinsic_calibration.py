@@ -17,4 +17,4 @@ video_length_list = [video_dict['length'] for video_dict in video_dict_list]
 
 cameragroup = CameraGroup(cap_ids=config['cap_ids'], resolutions=config['resolutions'])
 cameragroup.intrinsic_calibrate_video(video_cap_list, video_length_list, chessboard)
-cameragroup.save_camera_group_info(config['camera_group_intrinsic'])
+cameragroup.save_camera_group_info(config['camera_group_parameter_names'])
