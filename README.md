@@ -6,6 +6,12 @@
 
 2025/03/23 : Add camera intrinsic calibration tool, single/multi camera recording tool.
 
+## ToDo
+
+1. Add camera extrinsic calibration tool
+2. GUI
+3. Tutorial/workflow videos
+
 ## Introduction
 
 I'm building a simple but reliable 3D mocap solution for Blender.
