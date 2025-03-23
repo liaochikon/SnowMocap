@@ -1,0 +1,13 @@
+{
+    "cap_ids" : [0, 1, 2, 3],
+    "resolutions" : [
+        [1280, 720],
+        [1280, 720],
+        [1280, 720],
+        [1280, 720]],
+    "video_names" : ["videos/04212024194216_0.avi",
+                     "videos/04212024194216_1.avi",
+                     "videos/04212024194216_2.avi",
+                     "videos/04212024194216_3.avi"],
+    "camera_group_parameter_names" : "camera_group_intrinsic"
+}
