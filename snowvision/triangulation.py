@@ -1,25 +1,4 @@
 import numpy as np
-import math
-
-class SecondOrderDynamic:
-    def __init__(self, f, z, r, x0):
-        pi = math.pi
-        self.k1 = z / (pi * f)
-        self.k2 = 1 / ((2 * pi * f) * (2 * pi * f))
-        self.k3 = r * z / (2 * pi * f)
-
-        self.xp = x0
-        self.y = x0
-        self.yd = 0
-
-    def update(self, T, x, xd = None):
-        if(xd == None):
-            xd = (x - self.xp) / T
-            self.xp = x
-
-        self.y = self.y + T * self.yd
-        self.yd = self.yd + T * (x + self.k3 * xd - self.y - self.k1 * self.yd) / self.k2
-        return self.y
 
 def Skew_Ray_Solver(hm, hs, tm, ts):
     H = np.hstack((hm, hs))
@@ -160,29 +139,3 @@ def Human_Triangulation_Condense(result,
               'hrnet_triangulate_person_scores' : condensed_person_scores_list}
     
     return result
-    
-def Human_Triangulation_Smooth(result, previous_result = None, f = 2, z = 0.75, r = 0, delta_time = 1 / 30):
-    damped_skeleton_list = []
-    second_order_dynamic_list = []
-    
-    if isinstance(previous_result, dict):
-        for person, sod in zip(result['hrnet_triangulate_points'], previous_result['second_order_dynamics']):
-            damped_skeleton = [pp[1].update(delta_time, pp[0]) for pp in zip(person, sod)]
-            damped_skeleton_list.append(damped_skeleton)
-        
-        result = {'hrnet_triangulate_points' : damped_skeleton_list,
-                  'hrnet_triangulate_keypoint_scores' : result['hrnet_triangulate_keypoint_scores'],
-                  'hrnet_triangulate_person_scores' : result['hrnet_triangulate_person_scores'],
-                  'second_order_dynamics' : previous_result['second_order_dynamics']}
-    else:
-        for person in result['hrnet_triangulate_points']:
-            second_order_dynamic_list.append([SecondOrderDynamic(f, z, r, p) for p in person])
-
-        result = {'hrnet_triangulate_points' : result['hrnet_triangulate_points'],
-                  'hrnet_triangulate_keypoint_scores' : result['hrnet_triangulate_keypoint_scores'],
-                  'hrnet_triangulate_person_scores' : result['hrnet_triangulate_person_scores'],
-                  'second_order_dynamics' : second_order_dynamic_list}
-
-    return result
-
-

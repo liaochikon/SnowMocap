@@ -1,8 +1,7 @@
 import numpy as np
 import json
 import copy
-from snowvision.util import Rotation_Matrix_to_Quaternion
-from snowvision.triangulation import SecondOrderDynamic
+from scipy.spatial.transform import Rotation
 
 def save_blender_result(blender_result, file_path):
     with open(file_path, "w") as outfile:
@@ -25,15 +24,8 @@ def Get_Root_Rotation(point_5, point_6, point_11, point_12):
                   y_vec_nrom,
                   z_vec_nrom]).T
     
-    quat = Rotation_Matrix_to_Quaternion(R)
-    quat = np.array([quat[3], quat[0], quat[1], quat[2]])
-
-    #ret = True
-    #if True in np.isnan(quat):
-    #    ret = False
-    #    #quat = np.array([1, 0, 0, 0])
-
-    return quat
+    r = Rotation.from_matrix(R)
+    return r.as_euler('xyz', degrees=False)
 
 def Get_Chest_IK(point_5, point_6):
     chest_ik = (point_5 + point_6) / 2
@@ -139,41 +131,6 @@ def Human_Triangulation_Blender(result, blender_armature_profile):
         
         blender_result['blender_armature_control_points'].append(control_point_list)
         blender_result['blender_armature_control_points_scores'].append(control_point_score_list)
-
-    return blender_result
-
-def Human_Triangulation_Blender_Smooth(current_blender_result, blender_armature_profile, blender_smooth_profile, previous_blender_result = None, delta_time = 1 / 30):
-    blender_result = {'blender_armature_control_points' : [],
-                      'blender_armature_control_points_scores' : [],
-                      'second_order_dynamics' : []}
-    
-    if isinstance(previous_blender_result, dict):
-        for control_point_list, second_order_dynamic_list, score_list in zip(current_blender_result['blender_armature_control_points'], 
-                                                                             previous_blender_result['second_order_dynamics'], 
-                                                                             current_blender_result['blender_armature_control_points_scores']):
-            soded_control_point_list = copy.deepcopy(blender_armature_profile)
-            for control_point_name in blender_armature_profile.keys():
-                sod = second_order_dynamic_list[control_point_name]
-                if score_list[control_point_name]:
-                    soded_control_point_list[control_point_name] = sod.update(delta_time, np.array(control_point_list[control_point_name])).tolist()
-                else:
-                    soded_control_point_list[control_point_name] = sod.update(delta_time, sod.xp).tolist()
-            blender_result['blender_armature_control_points'].append(soded_control_point_list)
-        blender_result['second_order_dynamics'] = previous_blender_result['second_order_dynamics']
-        blender_result['blender_armature_control_points_scores'] =   current_blender_result['blender_armature_control_points_scores']
-    else:
-        for control_point_list, score_list in zip(current_blender_result['blender_armature_control_points'], 
-                                                  current_blender_result['blender_armature_control_points_scores']):
-            sod_list = copy.deepcopy(blender_armature_profile)
-            for control_point_name in blender_armature_profile.keys():
-                f, z, r = blender_smooth_profile[control_point_name]
-                if score_list[control_point_name]:
-                    sod_list[control_point_name] = SecondOrderDynamic(f, z, r, np.array(control_point_list[control_point_name]))
-                else:
-                    sod_list[control_point_name] = SecondOrderDynamic(f, z, r, np.zeros(len(control_point_list[control_point_name])))
-            blender_result['second_order_dynamics'].append(sod_list)
-        blender_result['blender_armature_control_points'] = current_blender_result['blender_armature_control_points']
-        blender_result['blender_armature_control_points_scores'] = current_blender_result['blender_armature_control_points_scores']
 
     return blender_result
 
