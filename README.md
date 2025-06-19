@@ -4,6 +4,8 @@
 
 ## Update
 
+2025/06/19 : Change the mocap data filter to ukf(unscented Kalman filter).
+
 2025/03/23 : Add camera intrinsic calibration tool, single/multi camera recording tool.
 
 ## ToDo
