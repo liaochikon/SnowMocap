@@ -27,8 +27,8 @@ def Triangulation(camera_group, distance_tol, ax = None):
     return Triangulate_Point
 
 def Human_Triangulation(camera_group, keypoint_score_threshold=0.5, average_score_threshold=0.0, distance_threshold=0.05):
-    #hrnet_2d_points = []
-    #hrnet_camera_indice = []
+    hrnet_2d_points = []
+    hrnet_camera_indice = []
     hrnet_triangulate_points = []
     hrnet_triangulate_keypoint_scores = []
     hrnet_triangulate_person_scores = []
@@ -43,8 +43,6 @@ def Human_Triangulation(camera_group, keypoint_score_threshold=0.5, average_scor
                                        camera_group.cameras[sc].hrnet_point_score, 
                                        camera_group.cameras[sc].hrnet_points):
                     p_3d_points = []
-                    p_2d_points = []
-                    p_camera_indice = []
                     p_score = []
                     for hm, hs, sm, ss, wm, ws in zip(pm, ps, pms, pss, pwm, pws):
                         dist, W = Skew_Ray_Solver(hm, hs, tm, ts)
@@ -52,22 +50,25 @@ def Human_Triangulation(camera_group, keypoint_score_threshold=0.5, average_scor
                         if sm < keypoint_score_threshold or ss < keypoint_score_threshold or dist > distance_threshold:
                             score = 0
                         p_3d_points.append(W)
-                        p_2d_points.append([wm, ws])
-                        p_camera_indice.append([mc, sc])
                         p_score.append(score)
                     p_score_avg_score = np.mean(p_score)
                     if p_score_avg_score < average_score_threshold:
                         continue
+                    
+                    p_2d_points = [pwm, pws]
+                    p_camera_indice = [mc, sc]
 
                     hrnet_triangulate_points.append(np.array(p_3d_points))
-                    #hrnet_2d_points.append(np.array(p_2d_points))
-                    #hrnet_camera_indice.append(np.array(p_camera_indice))
+                    hrnet_2d_points.append(np.array(p_2d_points))
+                    hrnet_camera_indice.append(np.array(p_camera_indice))
                     hrnet_triangulate_keypoint_scores.append(np.array(p_score))
                     hrnet_triangulate_person_scores.append(p_score_avg_score) 
 
     result = {'hrnet_triangulate_points' : hrnet_triangulate_points,
               'hrnet_triangulate_keypoint_scores' : hrnet_triangulate_keypoint_scores,
-              'hrnet_triangulate_person_scores' : hrnet_triangulate_person_scores}
+              'hrnet_triangulate_person_scores' : hrnet_triangulate_person_scores,
+              'hrnet_2d_points' : hrnet_2d_points,
+              'hrnet_camera_indice' : hrnet_camera_indice}
 
     return result
 
@@ -83,9 +84,16 @@ def Human_Triangulation_Condense(result,
     condensed_person_keypoint_scores_list = []
     condensed_person_scores_list = []
     condensed_person_index_list = []
+    w0_condense = []
+    cam_condense = []
     for mc in range(person_num - 1):
         if mc in condensed_person_index_list:
             continue
+
+        w0_condense_temp = []
+        cam_condense_temp = []
+        w0_condense_temp.append(result['hrnet_2d_points'][mc])
+        cam_condense_temp.append(result['hrnet_camera_indice'][mc])
         
         main_person = result['hrnet_triangulate_points'][mc]
         main_center_point = main_person[center_point_index]
@@ -107,6 +115,11 @@ def Human_Triangulation_Condense(result,
             condensed_person_index_list.append(sc)
             condense_person_list.append(sub_person)
             condense_person_scores_list.append(sub_person_keypoint_scores)
+            w0_condense_temp.append(result['hrnet_2d_points'][sc])
+            cam_condense_temp.append(result['hrnet_camera_indice'][sc])
+
+        w0_condense.append(w0_condense_temp)
+        cam_condense.append(cam_condense_temp)
         
         condense_person_num = len(condense_person_list)
         if condense_person_num < condense_person_num_tol:
@@ -136,6 +149,8 @@ def Human_Triangulation_Condense(result,
 
     result = {'hrnet_triangulate_points' : condensed_person_list,
               'hrnet_triangulate_keypoint_scores' : condensed_person_keypoint_scores_list,
-              'hrnet_triangulate_person_scores' : condensed_person_scores_list}
+              'hrnet_triangulate_person_scores' : condensed_person_scores_list,
+              'hrnet_2d_points' : w0_condense,
+              'hrnet_camera_indice' : cam_condense}
     
     return result

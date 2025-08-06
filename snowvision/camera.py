@@ -1,7 +1,9 @@
+from scipy.spatial.transform import Rotation
+from scipy.optimize import least_squares
+from scipy.sparse import lil_matrix
 import numpy as np
 import cv2
 import json
-
 from snowvision.triangulation import *
 
 class ChessBoard:
@@ -192,7 +194,7 @@ class CameraGroup:
         for camera in self.cameras:
             camera.record_end()
 
-    def intrinsic_calibrate_video(self, caps, lengths, chessboard : ChessBoard, sample_num = 40):
+    def intrinsic_calibrate_video(self, caps, lengths, chessboard : ChessBoard, sample_num = 40, show_vid = True):
         print("Start calibrating total " + str(len(caps)) + " cameras")
         for c, cap in enumerate(caps):
             objpoints = []
@@ -201,6 +203,11 @@ class CameraGroup:
                 _, frame = cap.read()
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 ret, corners = cv2.findChessboardCorners(gray, (chessboard.height, chessboard.width), None)
+                if show_vid:
+                    if ret:
+                        cv2.drawChessboardCorners(frame, (chessboard.height, chessboard.width), corners, ret)
+                    cv2.imshow("Intrinsic Calibration", frame)
+                    cv2.waitKey(1)
                 if ret == False:
                     continue  
                 print("Get chessboard at frame " + str(i))
@@ -216,6 +223,8 @@ class CameraGroup:
             _, mtx, dist, _, _ = cv2.calibrateCamera(objpoints, imgpoints, (self.cameras[c].frame_width, self.cameras[c].frame_height), None, None)
             self.cameras[c].K = mtx
             self.cameras[c].D = dist
+
+            cv2.destroyAllWindows()
 
     def add_2D_points(self, points, camera_index, ax = None):
         R = self.cameras[camera_index].R
@@ -260,4 +269,82 @@ class CameraGroup:
             camera.hrnet_point_rays = []
             camera.hrnet_point_score = []
 
+    def Human_Bundle_Adjustment(self, W_list, w_list, camera_indices, point_indices):
+        J = bundle_adjustment_sparsity(self.camera_num, len(W_list), camera_indices, point_indices)
+        x0 = self.BA_x0(W_list)
+        e0 = self.BA_Reprojecion_Error(x0, W_list, w_list, camera_indices, point_indices)
+        res = least_squares(self.BA_Reprojecion_Error, x0, jac_sparsity=J, verbose=2, ftol=1e-8, method='trf',
+        args=(W_list, w_list, camera_indices, point_indices))
+        e = self.BA_Reprojecion_Error(res['x'], W_list, w_list, camera_indices, point_indices)
 
+        print("Before")
+        print(np.sum(np.abs(e0)))
+        print("After")
+        print(np.sum(np.abs(e)))
+
+    def BA_Reprojecion_Error(self, params, W_list, w_list, c_list, p_list):
+        param_len = 7
+        r_index = 4
+        cam_params = params[:self.camera_num * param_len].reshape((self.camera_num, param_len))
+        cam_params = cam_params[1:]
+        for i, param in enumerate(cam_params, start=1):
+            q = param[:r_index]
+            t = param[r_index:].reshape((-1, 1))
+            self.cameras[i].R = Quaternion_to_Rotation_Matrix(q)
+            self.cameras[i].t = t
+
+        e = []
+        for p, w, c in zip(p_list, w_list, c_list):
+            Km = self.cameras[c].K
+            Rm = self.cameras[c].R
+            tm = self.cameras[c].t
+            em = Reprojection_Error(W_list[p], Km, Rm, tm, w)
+            e.append(em[0][0])
+            e.append(em[1][0])         
+        return e
+
+    def BA_x0(self, W_list):
+        x0 = np.array([])
+        for i in range(self.camera_num):
+            R = self.cameras[i].R
+            q = Rotation_Matrix_to_Quaternion(R)
+            t = self.cameras[i].t
+            x0 = np.append(x0, q)
+            x0 = np.append(x0, t)
+        x0 = np.hstack((x0, np.array(W_list).ravel()))
+        return x0
+    
+def Quaternion_to_Rotation_Matrix(q):
+    r = Rotation.from_quat(q)
+    return r.as_matrix()
+
+def Rotation_Matrix_to_Quaternion(R):
+    r = Rotation.from_matrix(R)
+    return r.as_quat()
+
+def bundle_adjustment_sparsity(n_cameras, n_points, camera_indices, point_indices):
+    m = camera_indices.size * 2
+    n = n_cameras * 7 + n_points * 3
+    A = lil_matrix((m, n), dtype=int)
+    i = np.arange(camera_indices.size)
+    for s in range(7):
+        A[2 * i, camera_indices * 7 + s] = 1
+        A[2 * i + 1, camera_indices * 7 + s] = 1
+
+    for s in range(3):
+        A[2 * i, n_cameras * 7 + point_indices * 3 + s] = 1
+        A[2 * i + 1, n_cameras * 7 + point_indices * 3 + s] = 1
+    return A
+
+def Reprojection_Error(W, K, R, t, w):
+    W = W.reshape((-1, 1))
+    R_inv = np.linalg.inv(R)
+    W_T = np.matmul(R_inv, W - t)
+    sw = np.matmul(K, W_T)
+    s = sw[2]
+    w_re = sw / s
+    w_re = w_re.reshape(3)[:2]
+    e = w - w_re
+    # if np.any(np.isnan(e)) or np.any(np.isinf(e)):
+    #     e = np.zeros(2)
+    return e.reshape((-1, 1))

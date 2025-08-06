@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from rtmlib import Wholebody, draw_skeleton
+from rtmlib import Wholebody, draw_skeleton, Hand
 from argparse import ArgumentParser
 from tqdm import tqdm
 from snowvision import *

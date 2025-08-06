@@ -3,3 +3,5 @@ __pycache__/
 videos/*
 mocap_data_output/*
 rtmlib/
+ex/
+in/
